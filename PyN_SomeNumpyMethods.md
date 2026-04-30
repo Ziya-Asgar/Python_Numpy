@@ -19,6 +19,7 @@
     - [`sum`, `mean`](#sum-mean)
     - [`cumsum`, `cumprod`](#cumsum-cumprod)
     - [`std`](#std)
+  - [`where`](#where)
 
 ---
 
@@ -513,6 +514,72 @@ print(df.std())
 dtype: float64
 """
 ```
+
+---
+
+---
+
+## `where`
+
+The `numpy.where` function is a vectorized version of the ternary expression `x if condition else y`:
+
+```py
+import numpy as np
+
+xarr = np.array([1.1, 1.2, 1.3, 1.4, 1.5])
+yarr = np.array([2.1, 2.2, 2.3, 2.4, 2.5])
+cond = np.array([True, False, True, True, False])
+
+result = np.where(cond, xarr, yarr)
+
+print(result) # [1.1 2.2 1.3 1.4 2.5]
+```
+
+The second and third arguments to `numpy.where` don’t need to be arrays; one or both of them can be scalars.
+
+```py
+import numpy as np
+
+arr = np.array([
+  [ 10.0,  10.0,  10.0, -10.0],
+  [-10.0, -10.0,  10.0,  10.0],
+  [-10.0, -10.0,  10.0,  10.0],
+  [-10.0,  10.0, -10.0 , -10.0]
+])
+
+result = np.where(arr > 0, 2, -2)
+
+print(result)
+"""
+[[ 2  2  2 -2]
+ [-2 -2  2  2]
+ [-2 -2  2  2]
+ [-2  2 -2 -2]]
+"""
+```
+
+```py
+import numpy as np
+
+arr = np.array([
+  [ 10.0,  10.0,  10.0, -10.0],
+  [-10.0, -10.0,  10.0,  10.0],
+  [-10.0, -10.0,  10.0,  10.0],
+  [-10.0,  10.0, -10.0 , -10.0]
+])
+
+result = np.where(arr > 0, 2, arr)
+
+print(result)
+"""
+[[  2.   2.   2. -10.]
+ [-10. -10.   2.   2.]
+ [-10. -10.   2.   2.]
+ [-10.   2. -10. -10.]]
+"""
+```
+
+Using `numpy.where` does not check whether the index labels are aligned or not (and does not even require the objects to be the same length).
 
 ---
 
