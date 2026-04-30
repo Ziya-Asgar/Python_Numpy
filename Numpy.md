@@ -6,6 +6,7 @@
   - [Creating Ndarrays](#creating-ndarrays)
   - [Retrieving Information from Ndarrays](#retrieving-information-from-ndarrays)
   - [Some Operations on Ndarrays](#some-operations-on-ndarrays)
+    - [Sorting](#sorting)
     - [Changing the array items using boolean arrays](#changing-the-array-items-using-boolean-arrays)
     - [Slicing of ndarrays is not like slicing python lists](#slicing-of-ndarrays-is-not-like-slicing-python-lists)
     - [Copying ndarrays, partially or fully](#copying-ndarrays-partially-or-fully)
@@ -20,6 +21,10 @@
     - [`np.quantile`](#npquantile)
     - [`np.nanmean`](#npnanmean)
     - [Calculating the range](#calculating-the-range)
+    - [`any`, `all`](#any-all)
+    - [Set methods](#set-methods)
+      - [`numpy.unique`](#numpyunique)
+      - [`numpy.isin`](#numpyisin)
   - [Arithmetic with Numpy Arrays](#arithmetic-with-numpy-arrays)
     - [Math between 2 ndarrays](#math-between-2-ndarrays)
     - [Math between an ndarray and a single value](#math-between-an-ndarray-and-a-single-value)
@@ -54,12 +59,6 @@
     - [`sum`, `mean`](#sum-mean)
     - [`cumsum`, `cumprod`](#cumsum-cumprod)
     - [`std`](#std)
-    - [Methods for Boolean Arrays](#methods-for-boolean-arrays)
-      - [`any`, `all`](#any-all)
-    - [Sorting](#sorting)
-    - [Set methods](#set-methods)
-      - [`numpy.unique`](#numpyunique)
-      - [`numpy.isin`](#numpyisin)
   - [File Input and Output with Arrays](#file-input-and-output-with-arrays)
     - [Saving to and Loading from files with `numpy.save` and `numpy.load`](#saving-to-and-loading-from-files-with-numpysave-and-numpyload)
     - [Saving to files with `numpy.savez`](#saving-to-files-with-numpysavez)
@@ -98,6 +97,75 @@ While NumPy by itself does not provide modeling or scientific functionality, hav
 <hr>
 
 ## Some Operations on Ndarrays
+
+### Sorting
+
+Like Python’s built-in list type, NumPy arrays can be sorted in place with the `sort` method:
+
+```py
+import numpy as np
+
+arr = np.array([[1, -2, 3, -4, 5], [-6, 7, -8, 9, 10]])
+
+print(arr)
+"""
+[[ 1 -2  3 -4  5]
+ [-6  7 -8  9 10]]
+"""
+
+arr.sort()
+print(arr)
+"""
+[[-4 -2  1  3  5]
+ [-8 -6  7  9 10]]
+"""
+```
+
+You can sort each one-dimensional section of values in a multidimensional array in place along an axis by passing the axis number to `sort`. `arr.sort(axis=0)` sorts the values within each column, while `arr.sort(axis=1)` sorts across each row:
+
+```py
+import numpy as np
+
+arr = np.array([[1, -2, 3, -4, 5], [-6, 7, -8, 9, 10]])
+
+print(arr)
+"""
+[[ 1 -2  3 -4  5]
+ [-6  7 -8  9 10]]
+"""
+
+# sort by row
+arr.sort(axis=0)
+print(arr)
+"""
+[[-6 -2 -8 -4  5]
+ [ 1  7  3  9 10]]
+"""
+```
+
+```py
+import numpy as np
+
+arr = np.array([[1, -2, 3, -4, 5], [-6, 7, -8, 9, 10]])
+
+print(arr)
+"""
+[[ 1 -2  3 -4  5]
+ [-6  7 -8  9 10]]
+"""
+
+# sort by column
+arr.sort(axis=1)
+print(arr)
+"""
+[[-4 -2  1  3  5]
+ [-8 -6  7  9 10]]
+"""
+```
+
+Note that the top-level method `numpy.sort` returns a sorted copy of an array (like the Python built-in function `sorted`) instead of modifying the array in place.
+
+<hr>
 
 ### Changing the array items using boolean arrays
 
@@ -473,6 +541,74 @@ import numpy as np
 
 x = np.arange(1, 101)
 print(np.ptp(x)) # 99
+```
+
+<hr>
+
+### `any`, `all`
+
+`any` and `all`, are useful especially for Boolean arrays.
+
+- `any` tests whether one or more values in an array is `True`,
+- while `all` checks if every value is `True`:
+
+```py
+import numpy as np
+
+bools = np.array([False, False, True, False])
+
+print(bools.any()) # True
+print(bools.all()) # False
+```
+
+These methods also work with non-Boolean arrays, where nonzero elements are treated as `True`.
+
+```py
+import numpy as np
+
+arr = np.array([1, 2, 3, 4])
+
+print((arr > 2).any())
+print((arr > 0).all())
+```
+
+<hr>
+
+### Set methods
+
+See below table for a listing of array set operations in NumPy.
+
+| Method              | Description                                                                        |
+| ------------------- | ---------------------------------------------------------------------------------- |
+| `unique(x)`         | Compute the sorted, unique elements in `x`                                         |
+| `intersect1d(x, y)` | Compute the sorted, common elements in `x` and `y`                                 |
+| `union1d(x, y)`     | Compute the sorted union of elements                                               |
+| `in1d(x, y)`        | Compute a Boolean array indicating whether each element of `x` is contained in `y` |
+| `setdiff1d(x, y)`   | Set difference, elements in `x` that are not in `y`                                |
+| `setxor1d(x, y)`    | Set symmetric differences; elements that are in either of the arrays, but not both |
+
+#### `numpy.unique`
+
+NumPy has some basic set operations for one-dimensional ndarrays. A commonly used one is `numpy.unique`, which returns the sorted unique values in an array:
+
+```py
+import numpy as np
+
+names = np.array(["Bob", "Will", "Joe", "Bob", "Will", "Joe", "Joe"])
+print(np.unique(names)) # ['Bob' 'Joe' 'Will']
+```
+
+<hr>
+
+#### `numpy.isin`
+
+Another function, `numpy.isin`, tests if the values in one array is present in another array, returning a Boolean array:
+
+```py
+import numpy as np
+
+values = np.array([6, 0, 0, 3, 2, 5, 6])
+print(np.isin(values, [2, 3, 6])) # [ True False False  True  True False  True]
 ```
 
 <hr>
@@ -1165,145 +1301,6 @@ print(df.std())
 0    2.160247
 dtype: float64
 """
-```
-
-<hr>
-
-### Methods for Boolean Arrays
-
-#### `any`, `all`
-
-`any` and `all`, are useful especially for Boolean arrays.
-
-- `any` tests whether one or more values in an array is `True`,
-- while `all` checks if every value is `True`:
-
-```py
-import numpy as np
-
-bools = np.array([False, False, True, False])
-
-print(bools.any()) # True
-print(bools.all()) # False
-```
-
-These methods also work with non-Boolean arrays, where nonzero elements are treated as `True`.
-
-```py
-import numpy as np
-
-arr = np.array([1, 2, 3, 4])
-
-print((arr > 2).any())
-print((arr > 0).all())
-```
-
-<hr>
-
-### Sorting
-
-Like Python’s built-in list type, NumPy arrays can be sorted in place with the `sort` method:
-
-```py
-import numpy as np
-
-arr = np.array([[1, -2, 3, -4, 5], [-6, 7, -8, 9, 10]])
-
-print(arr)
-"""
-[[ 1 -2  3 -4  5]
- [-6  7 -8  9 10]]
-"""
-
-arr.sort()
-print(arr)
-"""
-[[-4 -2  1  3  5]
- [-8 -6  7  9 10]]
-"""
-```
-
-You can sort each one-dimensional section of values in a multidimensional array in place along an axis by passing the axis number to `sort`. `arr.sort(axis=0)` sorts the values within each column, while `arr.sort(axis=1)` sorts across each row:
-
-```py
-import numpy as np
-
-arr = np.array([[1, -2, 3, -4, 5], [-6, 7, -8, 9, 10]])
-
-print(arr)
-"""
-[[ 1 -2  3 -4  5]
- [-6  7 -8  9 10]]
-"""
-
-# sort by row
-arr.sort(axis=0)
-print(arr)
-"""
-[[-6 -2 -8 -4  5]
- [ 1  7  3  9 10]]
-"""
-```
-
-```py
-import numpy as np
-
-arr = np.array([[1, -2, 3, -4, 5], [-6, 7, -8, 9, 10]])
-
-print(arr)
-"""
-[[ 1 -2  3 -4  5]
- [-6  7 -8  9 10]]
-"""
-
-# sort by column
-arr.sort(axis=1)
-print(arr)
-"""
-[[-4 -2  1  3  5]
- [-8 -6  7  9 10]]
-"""
-```
-
-Note that the top-level method `numpy.sort` returns a sorted copy of an array (like the Python built-in function `sorted`) instead of modifying the array in place.
-
-<hr>
-
-### Set methods
-
-See below table for a listing of array set operations in NumPy.
-
-| Method              | Description                                                                        |
-| ------------------- | ---------------------------------------------------------------------------------- |
-| `unique(x)`         | Compute the sorted, unique elements in `x`                                         |
-| `intersect1d(x, y)` | Compute the sorted, common elements in `x` and `y`                                 |
-| `union1d(x, y)`     | Compute the sorted union of elements                                               |
-| `in1d(x, y)`        | Compute a Boolean array indicating whether each element of `x` is contained in `y` |
-| `setdiff1d(x, y)`   | Set difference, elements in `x` that are not in `y`                                |
-| `setxor1d(x, y)`    | Set symmetric differences; elements that are in either of the arrays, but not both |
-
-#### `numpy.unique`
-
-NumPy has some basic set operations for one-dimensional ndarrays. A commonly used one is `numpy.unique`, which returns the sorted unique values in an array:
-
-```py
-import numpy as np
-
-names = np.array(["Bob", "Will", "Joe", "Bob", "Will", "Joe", "Joe"])
-print(np.unique(names)) # ['Bob' 'Joe' 'Will']
-```
-
-<hr>
-
-#### `numpy.isin`
-
-Another function, `numpy.isin`, tests if the values in one array is present in another array, returning a Boolean array:
-
-```py
-import numpy as np
-
-values = np.array([6, 0, 0, 3, 2, 5, 6])
-print(np.isin(values, [2, 3, 6])) # [ True False False  True  True False  True]
 ```
 
 <hr>
